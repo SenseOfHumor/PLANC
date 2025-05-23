@@ -1,0 +1,33 @@
+# Ignore environment variables
+.env
+# Ignore secrets
+.env.local
+# Ignore memory
+*.memory
+memory/
+memory.json
+memory.md
+# Ignore build artifacts
+build/
+dist/
+# Ignore coverage reports
+coverage/
+# Ignore logs
+logs/
+# Ignore temporary files
+*.tmp
+# Ignore IDE specific files
+.idea/
+# Ignore OS specific files
+.DS_Store
+# Ignore config files
+*.config
+config/
+config.json
+# Ifnore personal files
+*.personal
+resume/
+coverletter/
+resume_text.txt
+parsed/
+.planc/

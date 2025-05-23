@@ -1,5 +1,7 @@
 # PLANC-CLI
 
+`Not the first, or second, but the only plan.`
+
 **PLANC-CLI** is a powerful and intelligent command-line interface that automates the end-to-end process of resume and cover letter generation. It blends structured user memory, LLM-powered job description parsing, and LaTeX/Markdown generation into a seamless, session-aware workflow designed for power users and automation.
 
 ---
