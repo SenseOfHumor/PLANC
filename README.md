@@ -1,25 +1,56 @@
 # PLANC-CLI
 
-PLANC-CLI is a powerful command-line tool designed to automate and optimize the resume and cover letter creation process. It leverages LLMs to parse job descriptions, manages session state to streamline usage, and ensures all application artifacts are organized, logged, and reproducible.
+**PLANC-CLI** is a powerful and intelligent command-line interface that automates the end-to-end process of resume and cover letter generation. It blends structured user memory, LLM-powered job description parsing, and LaTeX/Markdown generation into a seamless, session-aware workflow designed for power users and automation.
 
 ---
 
-## Features
+## `Features at a Glance`
 
-* Session-aware command execution
-* Upload a job description once and reuse across commands
-* LLM-powered parsing of job descriptions
-* Resume generation in LaTeX format
-* Tailored cover letter generation (text + PDF)
-* Full CRUD support for user profile memory
-* Full deduplication support for all user fields
-* Organized file storage by date and company/role
-* Complete CSV logging of each application session
-* Support for copy-to-clipboard and Overleaf exports
+* Interactive `planc setup` for API keys and initial config
+
+* Session-aware CLI: upload a JD once, resume where you left off
+
+* Google Gemini-powered job description parsing and metadata extraction
+
+* Structured resume generation in LaTeX (with `.tex`, `.pdf`, clipboard, stdout support)
+
+* AI-assisted, well-formatted cover letters in `.txt` and `.pdf`
+
+* Full CRUD and deduplication support for user memory (name, email, skills, etc.)
+
+* Modular prompt system with editable templates and update support
+
+* Clean folder hierarchy by date and company/job-title parsed from JD
+
+* Complete logging for every session (CSV + optional JSON export)
+
+* One-command session replays, reusable job applications
+
+* Bootstrap script (`init-env`) for quick setup of dependencies
+
+* Future extensibility with prompt syncing and local inference support
+
+* Smart, session-aware command flow
+
+* One JD upload powers multiple downstream commands
+
+* Google Gemini-powered job description parsing
+
+* Resume generation with structured LaTeX output
+
+* Tailored, professional cover letter generation (text + PDF)
+
+* Persistent user profile with full CRUD and deduplication
+
+* Daily-organized file storage with clean folder naming
+
+* Application logging with session snapshots
+
+* Clipboard support, Overleaf export, reusability
 
 ---
 
-## Tech Stack
+## `Tech Stack`
 
 | Component        | Tool / Library      | Purpose                                       |
 | ---------------- | ------------------- | --------------------------------------------- |
@@ -33,15 +64,15 @@ PLANC-CLI is a powerful command-line tool designed to automate and optimize the 
 
 ---
 
-## Folder Structure
+## `Folder Structure`
 
-All application artifacts are saved under:
+All generated files are organized under:
 
 ```
 ~/.planc/logs/YYYY-MM-DD/{company_title}/
 ```
 
-Each session folder contains:
+Each folder contains:
 
 * resume\_{timestamp}.tex
 * resume\_{timestamp}.pdf
@@ -49,90 +80,97 @@ Each session folder contains:
 * coverletter\_{timestamp}.pdf
 * job\_description.txt
 * user\_snapshot.json
-* meta.json (optional)
+* meta.json (optional metadata from parsed JD)
 
 ---
 
-## CLI Commands
+## `CLI Command Reference`
+
+### Setup
+
+| Command          | Description                                                                       |
+| ---------------- | --------------------------------------------------------------------------------- |
+| `planc setup`    | Interactive setup for API keys and configuration. Creates `~/.planc/config.json`. |
+| `planc init-env` | Optional: bootstraps environment, checks dependencies, creates config folders.    |
 
 ### Job Description
 
-| Command               | Description                                       |
-| --------------------- | ------------------------------------------------- |
-| `planc -jd """..."""` | Upload new JD, parse company/title, start session |
-| `planc status`        | View current session details                      |
-| `planc clear`         | Reset current session                             |
+| Command               | Description                                     |
+| --------------------- | ----------------------------------------------- |
+| `planc -jd """..."""` | Uploads new JD, parses metadata, starts session |
+| `planc status`        | View current session status & file pointers     |
+| `planc clear`         | Reset session and clear state                   |
 
 ### Resume Generation
 
-| Command             | Description                                    |
-| ------------------- | ---------------------------------------------- |
-| `planc -r`          | Generate LaTeX + PDF resume (once per session) |
-| `planc -r --copy`   | Copy LaTeX source to clipboard                 |
-| `planc -r --stdout` | Print LaTeX to terminal                        |
-| `planc --force`     | Regenerate resume if already generated         |
+| Command             | Description                                             |
+| ------------------- | ------------------------------------------------------- |
+| `planc -r`          | Generate LaTeX + PDF resume (skip if already generated) |
+| `planc -r --copy`   | Copy LaTeX code to clipboard for Overleaf               |
+| `planc -r --stdout` | Output LaTeX to terminal directly                       |
+| `planc --force`     | Regenerate resume forcibly, even if present             |
 
 ### Cover Letter
 
-| Command             | Description                            |
-| ------------------- | -------------------------------------- |
-| `planc -c`          | Generate text + PDF cover letter       |
-| `planc -c --copy`   | Copy cover letter text to clipboard    |
-| `planc -c --stdout` | Print cover letter content to terminal |
+| Command             | Description                                   |
+| ------------------- | --------------------------------------------- |
+| `planc -c`          | Generate tailored cover letter (text + PDF)   |
+| `planc -c --copy`   | Copy letter content to clipboard              |
+| `planc -c --stdout` | Print letter to terminal for editing or reuse |
 
 ### User Memory (`fill`)
 
-| Command                             | Description                           |
-| ----------------------------------- | ------------------------------------- |
-| `planc fill init`                   | Setup wizard for name, skills, etc.   |
-| `planc fill show`                   | Display saved profile                 |
-| `planc fill reset`                  | Reset full user profile               |
-| `planc fill add --field --value`    | Add item to list field (deduplicated) |
-| `planc fill update --field --value` | Update scalar field                   |
-| `planc fill remove --field --value` | Remove item from list field           |
-| `planc fill delete --field`         | Delete entire field                   |
+| Command                             | Description                                      |
+| ----------------------------------- | ------------------------------------------------ |
+| `planc fill init`                   | Setup wizard for user info (name, email, skills) |
+| `planc fill show`                   | View saved memory snapshot                       |
+| `planc fill reset`                  | Reset entire memory state                        |
+| `planc fill add --field --value`    | Add item to list field (deduplicated)            |
+| `planc fill update --field --value` | Update scalar field like name or email           |
+| `planc fill remove --field --value` | Remove item from list field                      |
+| `planc fill delete --field`         | Delete a full field from memory                  |
 
 ### Logs
 
-| Command                              | Description                    |
-| ------------------------------------ | ------------------------------ |
-| `planc log`                          | Show application history (CSV) |
-| `planc log --last`                   | Show most recent entry         |
-| `planc log --filter date=YYYY-MM-DD` | Filter logs by date            |
-| `planc log --export json`            | Export logs as JSON            |
+| Command                              | Description                                     |
+| ------------------------------------ | ----------------------------------------------- |
+| `planc log`                          | View full application history (CSV)             |
+| `planc log --last`                   | View most recent session entry                  |
+| `planc log --filter date=YYYY-MM-DD` | Filter logs by date string                      |
+| `planc log --export json`            | Export structured log as JSON for dashboard use |
 
 ### Utilities
 
-| Command                    | Description                               |
-| -------------------------- | ----------------------------------------- |
-| `planc export --zip`       | Export resume/cover as Overleaf-ready zip |
-| `planc debug session`      | Print raw session.json                    |
-| `planc debug paths`        | Show current output paths                 |
-| `planc reapply` (optional) | Reuse past session for a new application  |
+| Command                    | Description                                          |
+| -------------------------- | ---------------------------------------------------- |
+| `planc export --zip`       | Export entire session as Overleaf-ready .zip archive |
+| `planc debug session`      | Print raw session.json for diagnostics               |
+| `planc debug paths`        | Output all key file paths for this session           |
+| `planc reapply` (optional) | Reuse past session to apply to a new JD              |
 
 ---
 
-## Roadmap (6-7 Days) 
+## `Roadmap (6–7 Day Rollout)`
 `NOTE: This is a summer project of mine and may not follow the below timeline exactly, Delays due to travel and "fun stuff" is unavoidable`
 
-| Day | Focus Area             | Goals                                            |
-| --- | ---------------------- | ------------------------------------------------ |
-| 1   | Session & JD Upload    | Folder structure, JD parsing, session.json       |
-| 2   | Resume Generator       | Generate `.tex`, `.pdf`, and support copy/stdout |
-| 3   | Cover Letter Generator | Generate `.txt`, `.pdf` from LLM and convert     |
-| 4   | Memory CRUD (`fill`)   | Full user profile editing from CLI               |
-| 5   | Logging System         | Log each session to `planc_log.csv`              |
-| 6   | Utilities & Status     | status, clear, debug, zip, reapply               |
-| 7   | Testing & Polish       | Final testing, UX refinement, docs               |
+| Day | Focus Area             | Deliverables                                   |
+| --- | ---------------------- | ---------------------------------------------- |
+| 1   | Session & JD Handling  | Folder logic, JD parser, session engine        |
+| 2   | Resume Generator       | `.tex` + `.pdf`, copy/stdout support           |
+| 3   | Cover Letter Generator | `.txt` + `.pdf` writer from LLM/Markdown       |
+| 4   | User Memory (`fill`)   | Full CRUD CLI with deduplication support       |
+| 5   | Logging & Persistence  | CSV logs, metadata writebacks                  |
+| 6   | Utilities & Debug      | `status`, `debug`, zip/export features         |
+| 7   | Testing & Polish       | Refactors, UX refinements, README finalization |
 
 ---
 
-## License
+## `License`
 
 MIT
 
 ---
 
-## Author
+## `Author`
 
 Swapnil Deb
