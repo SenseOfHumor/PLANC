@@ -15,16 +15,16 @@ import time
 CONFIG_PATH = Path.home() / ".planc" / "config.json"
 
 @contextmanager
-def spinner(message: str, style: str = "toggle2"):
+def spinner(message: str = "Thinking...", style: str = "toggle2"):
     """ spinner functions, returns a context manager"""
     console = Console()
-    with console.status("[bold green]Thinking...", spinner="toggle2"):
+    with console.status(f"[bold green]{message}", spinner=style):
         yield
 
 
 def test_gemini() -> None:
     """ Test the API key """
-    with spinner("Testing API key...", None):
+    with spinner("Testing API key..."):
         test_response = planc_engine.test_gemini()
     if not test_response:
         print("[bold red]Test failed. Please check your API key.[/]")
@@ -73,15 +73,16 @@ def run_setup():
             raise ValueError("[bold red]Invalid file type. Please provide a .pdf or .docx file.[/]")
         
         if resume_path.endswith('.pdf'):
-            data = parse.read_pdf_file(resume_path)
+            with spinner("Reading PDF file..."):
+                data = parse.read_pdf_file(resume_path)
             if not data:
                 raise ValueError("[bold red]No text found in the PDF file.[/]")
-            ## implement llm call to save structured data to file
+
         elif resume_path.endswith('.docx'):
-            data = parse.read_docx_file(resume_path)
+            with spinner("Reading PDF file..."):
+                data = parse.read_pdf_file(resume_path)
             if not data:
                 raise ValueError("[bold red]No text found in the DOCX file.[/]")
-            ## implement llm call to save structured data to file
 
         ## Save structured data, add to config
         utils.update_config_field("resume_file", resume_path)
@@ -92,11 +93,28 @@ def run_setup():
     except Exception as e:
         print(f"[bold red] Error during setup: {e}\nPlease try again.[/]")
 
-    ## TODO: Add option to parse resume before completing setup, they can choose to skip and do it later using --parser command
-
     ## Test the API key
-    test_gemini()
+    with spinner("Testing API key..."):
+        test_gemini()
+
+    ## TODO: Add option to parse resume before completing setup, they can choose to skip and do it later using --parser command
+    print("[bold yellow]Do you want to convert your resume to computer-readable format? You can do it later by using \"--parser\" flag(y/n)[/]")
+    if input().lower() == 'y':
+        with spinner("Converting resume..."):
+            try:
+                pass
+                ## TODO: Implement the LLM parsing logic
+                ## TODO: Save the parsed data to a JSON file
+                ## TODO: Add the parsed file path to the config file
+                ## TODO: Show the user the path to the parsed file
+            except Exception as e:
+                print(f"[bold red]Error during conversion: {e}[/]")
+                return
+    else:
+        print("[bold yellow]Skipping resume conversion.[/]")
+
     print("[bold green]Setup completed successfully![/]")
+    print("[yellow]Use --help to know more about the commands.[/]")
 
 
 ################################################################################################################################
