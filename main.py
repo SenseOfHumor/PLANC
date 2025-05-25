@@ -9,8 +9,28 @@ from datetime import datetime
 import core.parse as parse
 import core.utils as utils
 import core.planc_engine as planc_engine
+from contextlib import contextmanager
+import time
 
 CONFIG_PATH = Path.home() / ".planc" / "config.json"
+
+@contextmanager
+def spinner(message: str, style: str = "toggle2"):
+    """ spinner functions, returns a context manager"""
+    console = Console()
+    with console.status("[bold green]Thinking...", spinner="toggle2"):
+        yield
+
+
+def test_gemini() -> None:
+    """ Test the API key """
+    with spinner("Testing API key...", None):
+        test_response = planc_engine.test_gemini()
+    if not test_response:
+        print("[bold red]Test failed. Please check your API key.[/]")
+        return
+    print(f"[green]Planc Engine {test_response}[/]")
+
 
 def run_setup():
     """
@@ -29,10 +49,11 @@ def run_setup():
             utils.reset_config_folder()
             print(f"[bold green]Config file re-initialized at {utils.CONFIG_PATH}.[/]")
         else: 
+            test_gemini()
             print("[bold red]Exiting setup...[/]")
             return
         
-    print("[bold green]Setup complete!\n------------------------------\nTo proceed, enter your Google Gemini API key: [/]")
+    print("[bold green]Setup complete!\n--------------------------------------------\nTo proceed, enter your Google Gemini API key: [/]")
 
     ## API key storage
     api_key = input()
@@ -43,7 +64,7 @@ def run_setup():
     print("[bold yellow]Note: This key will be stored in the config file.[/]")
 
     ## Resume file parsing and storage
-    resume_path = input("Please provide the absolute path to your resume file ( .pdf or .docx): ").strip()
+    resume_path = input("Please provide the absolute path to your resume file (.pdf or .docx): ").strip()
     data = ""
     try:
         if not os.path.exists(resume_path):
@@ -71,13 +92,19 @@ def run_setup():
     except Exception as e:
         print(f"[bold red] Error during setup: {e}\nPlease try again.[/]")
 
+    ## TODO: Add option to parse resume before completing setup, they can choose to skip and do it later using --parser command
+
     ## Test the API key
-    test_response = planc_engine.test_gemini()
-    if not test_response:
-        print("[bold red]Test failed. Please check your API key.[/]")
-        return
-    print(f"[green]Test successful! Response: Planc Engine {test_response}[/]")
+    test_gemini()
     print("[bold green]Setup completed successfully![/]")
+
+
+################################################################################################################################
+#                                                                                                                              #
+#                                                  Helper Functions End                                                        #
+#                                                  CLI Application Starts                                                      #
+#                                                                                                                              #
+################################################################################################################################
 
 
 app = typer.Typer()
@@ -85,9 +112,14 @@ app = typer.Typer()
 @app.command()
 def planc(
     setup: bool = typer.Option(False, "--setup", help="Run initial setup"),
+    test: bool = typer.Option(False, "--test", help="Test the API Key"),
 ):
     if setup:
         run_setup()
+        return
+    
+    if test:
+        test_gemini()
         return
     
     print("[bold yellow]No option provided. Use --help to know more.[/bold yellow]")
