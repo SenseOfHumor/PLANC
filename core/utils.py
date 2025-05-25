@@ -41,3 +41,17 @@ def update_config_field(key: str, value: str):
     config[key] = value
     save_config(config)
 
+def get_gemini_api_key() -> str:
+    config = load_config()
+    if "gemini_api_key" in config:
+        return config["gemini_api_key"]
+    else:
+        raise ValueError("Gemini API key not found in config file. Please run setup.")
+    
+def get_resume_json() -> json:
+    if get_resume_json_path().exists():
+        return json.loads(get_resume_json_path().read_text())
+    else:
+        raise ValueError("Resume JSON file not found. Please run setup.")
+    
+

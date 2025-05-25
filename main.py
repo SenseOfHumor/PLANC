@@ -8,6 +8,7 @@ import shutil
 from datetime import datetime
 import core.parse as parse
 import core.utils as utils
+import core.planc_engine as planc_engine
 
 CONFIG_PATH = Path.home() / ".planc" / "config.json"
 
@@ -70,8 +71,13 @@ def run_setup():
     except Exception as e:
         print(f"[bold red] Error during setup: {e}\nPlease try again.[/]")
 
-    
-
+    ## Test the API key
+    test_response = planc_engine.test_gemini()
+    if not test_response:
+        print("[bold red]Test failed. Please check your API key.[/]")
+        return
+    print(f"[green]Test successful! Response: Planc Engine {test_response}[/]")
+    print("[bold green]Setup completed successfully![/]")
 
 
 app = typer.Typer()

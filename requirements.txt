@@ -2,3 +2,6 @@ typer
 pdfplumber
 rich
 python-docx
+pydantic
+google-genai
+requests

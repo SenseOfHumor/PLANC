@@ -1,5 +1,6 @@
 {
     "gemini_api_key": "YOUR-API-KEY-HERE",
-    "resume_path": "/path/to/your_resume.pdf"
+    "resume_path": "/path/to/your_resume.pdf",
+    "timestamp": "2025-05-23T21:01:36.152933"
   }
   
