@@ -104,9 +104,13 @@ def run_setup():
             try:
                 pass
                 ## TODO: Implement the LLM parsing logic
+                structured_data = planc_engine.parse_resume(utils.load_resume_text())
                 ## TODO: Save the parsed data to a JSON file
+                utils.get_resume_json_path().write_text(json.dumps(structured_data, indent=2))
                 ## TODO: Add the parsed file path to the config file
+                utils.update_config_field("resume_parsed_file", str(utils.get_resume_json_path()))
                 ## TODO: Show the user the path to the parsed file
+                print(f"[bold green]Resume parsed successfully! Data saved at {utils.get_resume_json_path()}[/]")
             except Exception as e:
                 print(f"[bold red]Error during conversion: {e}[/]")
                 return

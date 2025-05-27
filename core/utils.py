@@ -54,4 +54,6 @@ def get_resume_json() -> json:
     else:
         raise ValueError("Resume JSON file not found. Please run setup.")
     
+def load_resume_text() -> str:
+    return get_resume_text_path().read_text() if get_resume_text_path().exists() else "NO DATA PROVIDED"
 
