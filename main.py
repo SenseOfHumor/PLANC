@@ -1,7 +1,9 @@
 import typer
+import sys
 from rich import print
 from rich.console import Console
 from pathlib import Path
+from typing import Optional
 import os
 import json
 import shutil
@@ -135,6 +137,8 @@ app = typer.Typer()
 def planc(
     setup: bool = typer.Option(False, "--setup", help="Run initial setup"),
     test: bool = typer.Option(False, "--test", help="Test the API Key"),
+    parser: bool = typer.Option(False, "--parser", help="Parse the resume file to structured data"),
+    interactive_jd: bool = typer.Option(False, "--jd", help="Paste job description interactively"),
 ):
     if setup:
         run_setup()
@@ -144,7 +148,36 @@ def planc(
         test_gemini()
         return
     
-    print("[bold yellow]No option provided. Use --help to know more.[/bold yellow]")
+    if parser:
+        with spinner("Parsing resume..."):
+            try:
+                structured_data = planc_engine.parse_resume(utils.load_resume_text())
+                utils.get_resume_json_path().write_text(json.dumps(structured_data, indent=2))
+                utils.update_config_field("resume_parsed_file", str(utils.get_resume_json_path()))
+                print(f"[bold green]Resume parsed successfully! Data saved at {utils.get_resume_json_path()}[/]")
+            except Exception as e:
+                print(f"[bold red]Error during parsing: {e}[/]")
+        return
+    
+    if interactive_jd:
+
+        typer.echo("📩 Paste the job description below. Press ENTER then CTRL+D (or CTRL+Z on Windows) when done:\n")
+        jd = sys.stdin.read()
+        with spinner("Parsing job description..."):
+            data = planc_engine.parse_job(jd)
+        if not data:
+            print("[bold red]No data found in the job description.[/]")
+            return
+        print("[bold green]Job description parsed successfully![/]")
+        print(f"[green]Summary of your job: {json.dumps(data.get('summary'), indent=2)}[/]")
+        # TODO: Create a file to save the structured job description in case of future use, its a one-time use file, gets overwritten every time with the latest job description
+        # use utils.get_structured_job_description_path() to get the path and save the data
+        # use utils.update_config_field("structured_job_description", str(utils.get_structured_job_description_path())) to update the config file with the path to the structured job description file
+        # for reading, use utils.load_structured_job_description to get the structured job description data
+
+    # TODO: Print help message if no option is provided
+    if not (setup or test or parser or interactive_jd):
+        print("[bold yellow]No option provided. Use --help to know more.[/bold yellow]")
 
 
 if __name__ == "__main__":

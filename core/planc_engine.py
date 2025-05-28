@@ -91,6 +91,10 @@ class JobDescription(BaseModel):
         description="Deadline for applying (e.g., 'Apply by July 12', 'Closes in 2 weeks')."
     )
     job_posting_url: Optional[str] = None
+    summary: Optional[str] = Field(
+        default=None,
+        description="summary of the job description in plain language. Includes role, top responsibilities, and alignment hints."
+    )
 
 
 
@@ -139,6 +143,31 @@ def parse_resume(resume_text: str) -> Resume:
         config={
             "response_mime_type": "application/json",
             "response_schema": Resume,
+        },
+    )
+    # Use the response as a JSON string.
+    # print(response.text)
+
+    # Use instantiated objects.
+    structured_response : list[Test] = response.parsed
+    if not structured_response:
+        raise ValueError("No response received from Gemini API.")
+    return structured_response.model_dump(exclude_none=True)
+
+def parse_job(job_data: str) -> JobDescription:
+    if not job_data:
+        raise ValueError("Input Data provided seems to be empty, please check the input and try again.\n If the issue persists, restart Terminal.")
+    
+    client = get_gemini_client()
+    response = client.models.generate_content(
+        model= PARSE_MODEL,
+        contents= load_prompt(
+            "patterns/job_data_extraction.md",
+            job_data = job_data
+        ),
+        config={
+            "response_mime_type": "application/json",
+            "response_schema": JobDescription,
         },
     )
     # Use the response as a JSON string.
