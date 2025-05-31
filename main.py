@@ -141,6 +141,7 @@ def planc(
     parser: bool = typer.Option(False, "--parser", help="Parse the resume file to structured data"),
     interactive_jd: bool = typer.Option(False, "--jd", help="Paste job description interactively"),
     cover_letter: bool = typer.Option(False, "--c", help="Generate cover letter from resume and job description"),
+    tailored_resume: bool = typer.Option(False, "--r", help="Generate tailored resume from resume and job description"),
 ):
     if setup:
         run_setup()
@@ -197,9 +198,26 @@ def planc(
             except Exception as e:
                 print(f"[bold red]Error during cover letter generation: {e}[/]")
                 return
+            
+    if tailored_resume:
+        job_data = utils.load_structured_job_description()
+        resume_data = utils.load_resume_json()
+        if not job_data or not resume_data:
+            print("[bold red]Job description or resume data is missing. Please run --parser first.[/]")
+            return
+        with spinner("Generating tailored resume..."):
+            try:
+                tailored_resume_data = planc_engine.create_tailored_resume(job_data, resume_data)
+                tailored_resume_path = utils.CONFIG_PATH.parent / "tailored_resume.json"
+                tailored_resume_path.write_text(json.dumps(tailored_resume_data, indent=2))
+                print(f"[bold green]Tailored resume generated successfully! Data saved at {tailored_resume_path}[/]")
+                utils.update_config_field("temp_tailored_resume_file", str(tailored_resume_path))
+            except Exception as e:
+                print(f"[bold red]Error during tailored resume generation: {e}[/]")
+                return
 
     # TODO: Print help message if no option is provided
-    if not (setup or test or parser or interactive_jd or cover_letter):
+    if not (setup or test or parser or interactive_jd or cover_letter or tailored_resume):
         print("[bold yellow]No option provided. Use --help to know more.[/bold yellow]")
 
 

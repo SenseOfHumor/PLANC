@@ -199,6 +199,29 @@ def create_coverletter(job_data, resume_data) -> CoverLetter:
         raise ValueError("No response received from Gemini API.")
     return structured_response.model_dump(exclude_none=True)
 
+def create_tailored_resume(job_data, resume_data) -> Resume:
+    if not job_data or not resume_data:
+        raise ValueError ("Input Data provided seems to be empty, please check the input and try again.\n If the issue persists, restart Terminal.")
+    client = get_gemini_client()
+    response = client.models.generate_content(
+        model= PARSE_MODEL,
+        contents= load_prompt(
+            "patterns/custom_resume_generation.md",
+            job_data = job_data,
+            resume_data = resume_data
+        ),
+        config={
+            "response_mime_type": "application/json",
+            "response_schema": Resume,
+        },
+    )
+
+    # Use instantiated objects.
+    structured_response : list[Test] = response.parsed
+    if not structured_response:
+        raise ValueError("No response received from Gemini API.")
+    return structured_response.model_dump(exclude_none=True)
+
 
 # print(load_prompt("patterns/resume_data_extraction.md", resume_text=load_resume_text()))
 # res = (parse_resume(Path(RESUME_TEXT_PATH).read_text()))
