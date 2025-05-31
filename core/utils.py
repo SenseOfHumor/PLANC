@@ -54,4 +54,15 @@ def get_resume_json() -> json:
     else:
         raise ValueError("Resume JSON file not found. Please run setup.")
     
+def get_structured_job_description_path() -> Path:
+    return CONFIG_PATH.parent / "structured_job_description.json"  # Config folder -> path to structured job description file (volatile data with most recent job description)
+
+def load_structured_job_description() -> dict:
+    return json.loads(get_structured_job_description_path().read_text()) if get_structured_job_description_path().exists() else {}
+    
+def load_resume_text() -> str:
+    return get_resume_text_path().read_text() if get_resume_text_path().exists() else {}
+
+def load_resume_json() -> dict:
+    return json.loads(get_resume_json_path().read_text()) if get_resume_json_path().exists() else {}
 
