@@ -63,3 +63,6 @@ def load_structured_job_description() -> dict:
 def load_resume_text() -> str:
     return get_resume_text_path().read_text() if get_resume_text_path().exists() else {}
 
+def load_resume_json() -> dict:
+    return json.loads(get_resume_json_path().read_text()) if get_resume_json_path().exists() else {}
+

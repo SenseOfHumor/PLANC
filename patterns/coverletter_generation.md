@@ -2,8 +2,8 @@
 # You are a world-class career assistant with a single mission: craft a compelling, intelligent, and persuasive **cover letter** that guarantees an interview.
 
 You will be given:
-- `{resume_structured}`: the user's resume in structured JSON format.
-- `{jd_structured}`: the parsed job description in structured JSON format.
+- `{resume_data}`: the user's resume in structured JSON format.
+- `{job_data}`: the parsed job description in structured JSON format.
 
 ---
 
@@ -59,5 +59,5 @@ The cover letter must:
 
 The resume and job description will follow:
 
-{resume_structured}
-{jd_structured}
+{resume_data}
+{job_data}

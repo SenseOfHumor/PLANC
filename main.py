@@ -13,6 +13,7 @@ import core.utils as utils
 import core.planc_engine as planc_engine
 from contextlib import contextmanager
 import time
+import asyncio
 
 CONFIG_PATH = Path.home() / ".planc" / "config.json"
 
@@ -139,6 +140,7 @@ def planc(
     test: bool = typer.Option(False, "--test", help="Test the API Key"),
     parser: bool = typer.Option(False, "--parser", help="Parse the resume file to structured data"),
     interactive_jd: bool = typer.Option(False, "--jd", help="Paste job description interactively"),
+    cover_letter: bool = typer.Option(False, "--c", help="Generate cover letter from resume and job description"),
 ):
     if setup:
         run_setup()
@@ -172,11 +174,32 @@ def planc(
         print(f"[green]Summary of your job: {json.dumps(data.get('summary'), indent=2)}[/]")
         # TODO: Create a file to save the structured job description in case of future use, its a one-time use file, gets overwritten every time with the latest job description
         # use utils.get_structured_job_description_path() to get the path and save the data
+        utils.get_structured_job_description_path().write_text(json.dumps(data, indent=2))
+        print(f"[bold green]Structured job description saved at {utils.get_structured_job_description_path()}[/]")
+        print(json.dumps(data, indent=2))
         # use utils.update_config_field("structured_job_description", str(utils.get_structured_job_description_path())) to update the config file with the path to the structured job description file
         # for reading, use utils.load_structured_job_description to get the structured job description data
+        utils.update_config_field("temp_structured_job_description", str(utils.get_structured_job_description_path()))
+
+    if cover_letter:
+        job_data = utils.load_structured_job_description()
+        resume_data = utils.load_resume_json()
+        if not job_data or not resume_data:
+            print("[bold red]Job description or resume data is missing. Please run  --parser first.[/]")
+            return
+        with spinner("Generating cover letter..."):
+            try:
+                coverletter_data = planc_engine.create_coverletter(job_data, resume_data)
+                cover_letter_path = utils.CONFIG_PATH.parent / "cover_letter.json"
+                cover_letter_path.write_text(json.dumps(coverletter_data, indent=2))
+                print(f"[bold green]Cover letter generated successfully! Data saved at {cover_letter_path}[/]")
+                utils.update_config_field("temp_cover_letter_file", str(cover_letter_path))
+            except Exception as e:
+                print(f"[bold red]Error during cover letter generation: {e}[/]")
+                return
 
     # TODO: Print help message if no option is provided
-    if not (setup or test or parser or interactive_jd):
+    if not (setup or test or parser or interactive_jd or cover_letter):
         print("[bold yellow]No option provided. Use --help to know more.[/bold yellow]")
 
 
