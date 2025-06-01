@@ -64,25 +64,6 @@
 | PDF Generation   | weasyprint / pdfkit | Convert text/Markdown to styled PDF           |
 | Logging          | CSV, JSON           | Track session metadata and output references  |
 
----
-
-## `Folder Structure`
-
-All generated files are organized under:
-
-```
-~/.planc/logs/YYYY-MM-DD/{company_title}/
-```
-
-Each folder contains:
-
-* resume\_{timestamp}.tex
-* resume\_{timestamp}.pdf
-* coverletter\_{timestamp}.txt
-* coverletter\_{timestamp}.pdf
-* job\_description.txt
-* user\_snapshot.json
-* meta.json (optional metadata from parsed JD)
 
 ---
 
@@ -155,7 +136,7 @@ Each folder contains:
 ## `Roadmap (6–7 Day Rollout)`
 `NOTE: This is a summer project of mine and may not follow the below timeline exactly, Delays due to travel and "fun stuff" is unavoidable`
 
-| Day | Focus Area             | Deliverables                                   |
+| Session | Focus Area             | Deliverables                                   |
 | --- | ---------------------- | ---------------------------------------------- |
 | 1   | Session & JD Handling  | Folder logic, JD parser, session engine        |
 | 2   | Resume Generator       | `.tex` + `.pdf`, copy/stdout support           |
