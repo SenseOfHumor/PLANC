@@ -10,6 +10,9 @@ memory.md
 # Ignore build artifacts
 build/
 dist/
+__pycache__/
+*.py[cod]
+*$py.class
 # Ignore coverage reports
 coverage/
 # Ignore logs

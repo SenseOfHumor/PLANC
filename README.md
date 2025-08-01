@@ -148,6 +148,42 @@
 
 ---
 
+## `Development & Contributing`
+
+### Code Formatting
+
+This project uses **Black** for consistent Python code formatting. We use pre-commit hooks to automatically format code before commits.
+
+#### Setting up pre-commit hooks:
+
+1. Install pre-commit:
+   ```bash
+   pip install pre-commit
+   ```
+
+2. Install the git hooks:
+   ```bash
+   pre-commit install
+   ```
+
+3. (Optional) Run pre-commit on all files:
+   ```bash
+   pre-commit run --all-files
+   ```
+
+Once set up, Black will automatically format your Python code every time you commit changes. If Black makes any changes to your files, the commit will be halted, allowing you to review and re-commit the formatted code.
+
+#### Manual formatting:
+
+If you prefer to format files manually, you can install and run Black directly:
+
+```bash
+pip install black
+black .
+```
+
+---
+
 ## `License`
 
 MIT
